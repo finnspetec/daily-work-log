@@ -3,114 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工程技術部 - 數位日報系統</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>工程技術部日報</title>
     <style>
-        :root { --primary-orange: #FF6B00; --bg-dark: #1A1C1E; --grid-color: rgba(255, 255, 255, 0.03); }
-        body {
-            background-color: var(--bg-dark); color: #FFFFFF; font-family: 'Inter', sans-serif;
-            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; }
-        .personnel-card { transition: all 0.3s; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .personnel-card.active { border-color: var(--primary-orange); background: rgba(255, 107, 0, 0.1); box-shadow: 0 0 15px rgba(255, 107, 0, 0.2); }
-        .personnel-card.active .status-dot { background-color: var(--primary-orange); box-shadow: 0 0 8px var(--primary-orange); }
-        iframe { display: none; } /* 隱藏提交後的跳轉頁面 */
+        body { background-color: #1a1c1e; color: #fff; font-family: sans-serif; padding: 20px; }
+        .card { background: #2a2d30; border-top: 5px solid #ff6b00; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
+        h1 { color: #ff6b00; font-size: 24px; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #aaa; }
+        input, select, textarea { width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #ff6b00; border: none; color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #e66100; }
+        .person-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .person-btn { padding: 10px; background: #333; border: 1px solid #444; cursor: pointer; text-align: center; font-size: 14px; }
+        .person-btn.active { border-color: #ff6b00; color: #ff6b00; background: rgba(255,107,0,0.1); }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-12">
+<body>
 
-    <iframe name="hidden_iframe" id="hidden_iframe" onload="if(submitted){showSuccess();}"></iframe>
-
-    <div class="max-w-4xl mx-auto">
-        <header class="mb-12 relative">
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter mb-2 italic">
-                工程技術部 <span class="text-[#FF6B00]">工作日報</span>
-            </h1>
-            <p class="text-gray-400 mono text-sm uppercase tracking-widest">Engineering Technical Dept. // Daily Log</p>
-            <div class="h-px w-full bg-gradient-to-r from-[#FF6B00] to-transparent mt-6"></div>
-        </header>
-
-        <form action="https://docs.google.com/forms/d/e/1FAIpQLScYgZy257bhsIpbWWLjrb9AHGslh7XLqX-y5EEBlVoQvKNSnA/formResponse" 
-              method="POST" target="hidden_iframe" onsubmit="submitted=true;">
-
-            <main class="space-y-8">
-                <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-panel p-6">
-                        <label class="block text-xs mono text-[#FF6B00] mb-2 font-bold uppercase">01. 填表日期</label>
-                        <input type="date" name="entry.1335878800" id="dateInput" class="w-full bg-transparent border-b border-gray-700 py-2 focus:outline-none text-white text-xl" required>
-                    </div>
-                    <div class="glass-panel p-6">
-                        <label class="block text-xs mono text-[#FF6B00] mb-2 font-bold uppercase">02. 氣象狀態</label>
-                        <select name="entry.65954101" class="w-full bg-transparent border-b border-gray-700 py-2 focus:outline-none text-white">
-                            <option value="晴天" class="bg-[#1A1C1E]">☀️ 晴天 / Sunny</option>
-                            <option value="多雲" class="bg-[#1A1C1E]">☁️ 多雲 / Cloudy</option>
-                            <option value="雨天" class="bg-[#1A1C1E]">🌧️ 降雨 / Raining</option>
-                        </select>
-                    </div>
-                </section>
-
-                <section class="glass-panel p-8">
-                    <label class="block text-xs mono text-[#FF6B00] mb-6 font-bold uppercase">03. 填表人員 / Operator</label>
-                    <input type="hidden" name="entry.536561245" id="operatorInput" required>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="personnelContainer">
-                        </div>
-                </section>
-
-                <section class="glass-panel p-8">
-                    <label class="block text-xs mono text-[#FF6B00] mb-4 font-bold uppercase">04. 今日工作內容</label>
-                    <textarea name="entry.1093262937" rows="5" placeholder="請描述今日工作重點..." class="w-full bg-transparent p-4 border-l border-gray-800 focus:outline-none text-gray-200" required></textarea>
-                    
-                    <label class="block text-xs mono text-[#FF6B00] mt-6 mb-4 font-bold uppercase">05. 備註事項</label>
-                    <textarea name="entry.226885827" rows="2" placeholder="如有特殊狀況請註明..." class="w-full bg-transparent p-4 border-l border-gray-800 focus:outline-none text-gray-200"></textarea>
-                </section>
-
-                <footer class="flex justify-end pt-8">
-                    <button type="submit" id="submitBtn" class="px-12 py-4 bg-[#FF6B00] hover:bg-[#e66100] text-white font-bold mono text-sm uppercase shadow-[0_0_20px_rgba(255,107,0,0.3)] transition-all">
-                        Commit Log to System
-                    </button>
-                </footer>
-            </main>
-        </form>
-    </div>
-
-    <div id="toast" class="fixed bottom-10 right-10 glass-panel p-4 border-[#FF6B00] opacity-0 transition-all duration-500 pointer-events-none">
-        <span class="mono text-sm text-[#FF6B00]">✓ SUCCESS: LOG_COMMITTED</span>
-    </div>
-
-    <script>
-        let submitted = false;
-        const personnel = ["江輝琳", "吳凱銘", "李佳玲", "李鈞智", "林宏吉", "林慶倫"];
+<div class="card">
+    <h1>工程技術部 工作日報</h1>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLScYgZy257bhsIpbWWLjrb9AHGslh7XLqX-y5EEBlVoQvKNSnA/formResponse" method="POST">
         
-        // 產生人員卡片
-        const container = document.getElementById('personnelContainer');
-        personnel.forEach(name => {
-            const card = document.createElement('div');
-            card.className = 'personnel-card glass-panel p-4 flex items-center justify-between group';
-            card.innerHTML = `<span class="font-semibold text-gray-400 group-hover:text-white">${name}</span><div class="status-dot w-2 h-2 rounded-full bg-gray-700"></div>`;
-            card.onclick = () => {
-                document.querySelectorAll('.personnel-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                document.getElementById('operatorInput').value = name;
-            };
-            container.appendChild(card);
-        });
+        <div class="input-group">
+            <label>日期</label>
+            <input type="date" name="entry.1335878800" id="todayDate" required>
+        </div>
 
-        // 提交後的動作
-        function showSuccess() {
-            const toast = document.getElementById('toast');
-            toast.style.opacity = "1";
-            setTimeout(() => { 
-                alert("日報已成功上傳至系統！");
-                location.reload(); 
-            }, 1000);
-        }
+        <div class="input-group">
+            <label>填表人員</label>
+            <input type="hidden" name="entry.536561245" id="opInput" required>
+            <div class="person-grid" id="pGrid"></div>
+        </div>
 
-        // 自動填入今天日期
-        document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
-    </script>
+        <div class="input-group">
+            <label>天氣</label>
+            <select name="entry.65954101">
+                <option value="晴天">晴天</option>
+                <option value="多雲">多雲</option>
+                <option value="雨天">雨天</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>工作總結</label>
+            <textarea name="entry.1093262937" rows="5" required></textarea>
+        </div>
+
+        <button type="submit">確認提交日報</button>
+    </form>
+</div>
+
+<script>
+    const names = ["江輝琳", "吳凱銘", "李佳玲", "李鈞智", "林宏吉", "林慶倫"];
+    const grid = document.getElementById('pGrid');
+    const input = document.getElementById('opInput');
+
+    names.forEach(n => {
+        const btn = document.createElement('div');
+        btn.className = 'person-btn';
+        btn.innerText = n;
+        btn.onclick = () => {
+            document.querySelectorAll('.person-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            input.value = n;
+        };
+        grid.appendChild(btn);
+    });
+
+    document.getElementById('todayDate').value = new Date().toISOString().split('T')[0];
+</script>
+
 </body>
 </html>
