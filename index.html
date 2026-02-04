@@ -3,75 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工程技術部日報</title>
+    <title>工程技術部 - 數位日報系統 V2.0</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #1a1c1e; color: #fff; font-family: sans-serif; padding: 20px; }
-        .card { background: #2a2d30; border-top: 5px solid #ff6b00; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
-        h1 { color: #ff6b00; font-size: 24px; text-align: center; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; color: #aaa; }
-        input, select, textarea { width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #ff6b00; border: none; color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #e66100; }
-        .person-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .person-btn { padding: 10px; background: #333; border: 1px solid #444; cursor: pointer; text-align: center; font-size: 14px; }
-        .person-btn.active { border-color: #ff6b00; color: #ff6b00; background: rgba(255,107,0,0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #1a1c1e; color: #fff; }
+        .glass-panel { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .active-card { border: 2px solid #FF6B00 !important; background: rgba(255, 107, 0, 0.1) !important; }
     </style>
 </head>
 <body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-<div class="card">
-    <h1>工程技術部 工作日報</h1>
-    <form action="https://docs.google.com/forms/d/e/1FAIpQLScYgZy257bhsIpbWWLjrb9AHGslh7XLqX-y5EEBlVoQvKNSnA/formResponse" method="POST">
-        
-        <div class="input-group">
-            <label>日期</label>
-            <input type="date" name="entry.1335878800" id="todayDate" required>
-        </div>
+        const App = () => {
+            const [status, setStatus] = useState('idle');
+            const [selectedUser, setSelectedUser] = useState('');
+            const users = ["江輝琳", "吳凱銘", "李佳玲", "李鈞智", "林宏吉", "林慶倫"];
 
-        <div class="input-group">
-            <label>填表人員</label>
-            <input type="hidden" name="entry.536561245" id="opInput" required>
-            <div class="person-grid" id="pGrid"></div>
-        </div>
+            const handleSubmit = (event) => {
+                if(!selectedUser) { alert("請選擇填表人員"); return; }
+                setStatus('submitting');
+                // 資料會透過原生 Form 提交至 Google Form
+                setTimeout(() => {
+                    setStatus('submitted');
+                }, 1500);
+            };
 
-        <div class="input-group">
-            <label>天氣</label>
-            <select name="entry.65954101">
-                <option value="晴天">晴天</option>
-                <option value="多雲">多雲</option>
-                <option value="雨天">雨天</option>
-            </select>
-        </div>
+            if (status === 'submitted') return (
+                <div className="min-h-screen flex items-center justify-center p-6 text-center">
+                    <div className="max-w-md w-full bg-slate-800 p-12 rounded-[2rem] shadow-2xl border-t-[10px] border-[#FF6B00]">
+                        <div className="text-6xl mb-6">🚀</div>
+                        <h2 className="text-2xl font-black mb-4">日報上傳成功！</h2>
+                        <button onClick={() => window.location.reload()} className="w-full bg-[#FF6B00] text-white py-4 rounded-xl font-bold transition-all">下一筆填寫</button>
+                    </div>
+                </div>
+            );
 
-        <div class="input-group">
-            <label>工作總結</label>
-            <textarea name="entry.1093262937" rows="5" required></textarea>
-        </div>
+            return (
+                <div className="min-h-screen pb-12">
+                    <header className="bg-slate-900 py-10 px-6 text-center border-b border-slate-700">
+                        <h1 className="text-3xl font-black text-[#FF6B00] italic">工程技術部</h1>
+                        <p className="text-slate-400 mt-2 font-bold tracking-widest uppercase">Daily Operation Log // V2.0</p>
+                    </header>
 
-        <button type="submit">確認提交日報</button>
-    </form>
-</div>
+                    <main className="max-w-xl mx-auto -mt-6 px-4">
+                        <iframe name="hidden_confirm" style={{display:'none'}}></iframe>
+                        
+                        <form action="https://docs.google.com/forms/d/e/1FAIpQLScYgZy257bhsIpbWWLjrb9AHGslh7XLqX-y5EEBlVoQvKNSnA/formResponse" 
+                              method="POST" target="hidden_confirm" onSubmit={handleSubmit} className="space-y-5">
+                            
+                            {/* 1. 日期 */}
+                            <div className="glass-panel p-6 rounded-3xl shadow-xl">
+                                <label className="block text-[#FF6B00] font-black mb-3 text-sm tracking-widest uppercase">01. 填報日期</label>
+                                <input required type="date" name="entry.1335878800" defaultValue={new Date().toISOString().split('T')[0]} className="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl font-bold text-white" />
+                            </div>
 
-<script>
-    const names = ["江輝琳", "吳凱銘", "李佳玲", "李鈞智", "林宏吉", "林慶倫"];
-    const grid = document.getElementById('pGrid');
-    const input = document.getElementById('opInput');
+                            {/* 2. 天氣 */}
+                            <div className="glass-panel p-6 rounded-3xl shadow-xl">
+                                <label className="block text-[#FF6B00] font-black mb-3 text-sm tracking-widest uppercase">02. 今日天氣</label>
+                                <select required name="entry.65954101" className="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl font-bold text-white">
+                                    <option value="晴天">☀️ 晴天</option>
+                                    <option value="多雲">☁️ 多雲</option>
+                                    <option value="雨天">🌧️ 雨天</option>
+                                </select>
+                            </div>
 
-    names.forEach(n => {
-        const btn = document.createElement('div');
-        btn.className = 'person-btn';
-        btn.innerText = n;
-        btn.onclick = () => {
-            document.querySelectorAll('.person-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            input.value = n;
+                            {/* 3. 人員選擇 */}
+                            <div className="glass-panel p-6 rounded-3xl shadow-xl">
+                                <label className="block text-[#FF6B00] font-black mb-4 text-sm tracking-widest uppercase">03. 填表人員</label>
+                                <input type="hidden" name="entry.536561245" value={selectedUser} required />
+                                <div className="grid grid-cols-2 gap-3">
+                                    {users.map(u => (
+                                        <div key={u} 
+                                             onClick={() => setSelectedUser(u)}
+                                             className={`p-4 rounded-xl text-center font-bold cursor-pointer border border-slate-700 transition-all ${selectedUser === u ? 'active-card' : 'bg-slate-800'}`}>
+                                            {u}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 4. 工作總結 */}
+                            <div className="glass-panel p-6 rounded-3xl shadow-xl">
+                                <label className="block text-[#FF6B00] font-black mb-3 text-sm tracking-widest uppercase">04. 今日工作內容</label>
+                                <textarea required name="entry.1093262937" rows="5" className="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl font-bold text-white" placeholder="描述今日任務..."></textarea>
+                            </div>
+
+                            <button type="submit" className="w-full py-5 mt-4 rounded-2xl bg-[#FF6B00] text-white text-xl font-black shadow-lg active:scale-95 transition-all">確認提交日報</button>
+                        </form>
+                    </main>
+                </div>
+            );
         };
-        grid.appendChild(btn);
-    });
 
-    document.getElementById('todayDate').value = new Date().toISOString().split('T')[0];
-</script>
-
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
